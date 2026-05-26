@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Brain TDS Logistics — Importation & Delivery</title>
+<style>
+/* ---------- Reset & Base ---------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0A2540;
+  --navy-dark:#061a30;
+  --red:#D92323;
+  --red-dark:#b51b1b;
+  --white:#ffffff;
+  --gray-50:#f6f8fb;
+  --gray-100:#eef1f5;
+  --gray-200:#dde2ea;
+  --gray-400:#9aa3b2;
+  --gray-600:#5a6473;
+  --gray-800:#2a3140;
+  --shadow:0 10px 30px rgba(10,37,64,.08);
+  --shadow-lg:0 20px 50px rgba(10,37,64,.18);
+  --radius:12px;
+}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,sans-serif;
+  color:var(--gray-800);
+  background:var(--gray-50);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ---------- Header ---------- */
+.header{
+  background:var(--navy);
+  color:var(--white);
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(0,0,0,.15);
+}
+.header-inner{
+  max-width:1200px;margin:0 auto;padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo-box{
+  width:48px;height:48px;border-radius:10px;
+  background:linear-gradient(135deg,#10325a,#0A2540);
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--red);
+  position:relative;flex-shrink:0;
+}
+.logo-box svg,
+.logo-box img{width:30px;height:30px;object-fit:contain}
+.brand-text{display:flex;flex-direction:column;line-height:1.1}
+.brand-text .name{font-weight:800;letter-spacing:.5px;font-size:1.05rem}
+.brand-text .tag{font-size:.72rem;color:#a9c0db;letter-spacing:2px;text-transform:uppercase}
+.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.nav button{
+  color:var(--white);padding:8px 14px;border-radius:8px;font-size:.92rem;
+  transition:background .2s;
+}
+.nav button:hover{background:rgba(255,255,255,.08)}
+.nav .btn-cta{background:var(--red);font-weight:600}
+.nav .btn-cta:hover{background:var(--red-dark)}
+.menu-toggle{display:none;font-size:1.5rem;color:#fff}
+
+/* ---------- Hero ---------- */
+.hero{
+  background:
+    radial-gradient(circle at 20% 20%, rgba(217,35,35,.15), transparent 40%),
+    radial-gradient(circle at 80% 60%, rgba(20,80,150,.3), transparent 50%),
+    linear-gradient(135deg,var(--navy) 0%, #103258 100%);
+  color:var(--white);
+  padding:70px 24px 90px;
+}
+.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
+.hero h1{font-size:clamp(1.9rem,4vw,3.1rem);font-weight:800;line-height:1.1;margin-bottom:18px}
+.hero h1 span{color:var(--red)}
+.hero p.lead{font-size:1.05rem;color:#cfd9e6;max-width:520px;margin-bottom:28px}
+.hero-stats{display:flex;gap:30px;margin-top:30px;flex-wrap:wrap}
+.stat .num{font-size:1.8rem;font-weight:800;color:var(--white)}
+.stat .lbl{font-size:.8rem;color:#a9c0db;letter-spacing:1px;text-transform:uppercase}
+
+/* Track card in hero */
+.track-card{
+  background:var(--white);color:var(--gray-800);
+  border-radius:var(--radius);padding:28px;
+  box-shadow:var(--shadow-lg);
+}
+.track-card h3{color:var(--navy);font-size:1.25rem;margin-bottom:6px}
+.track-card .sub{color:var(--gray-600);font-size:.9rem;margin-bottom:18px}
+.track-input{display:flex;gap:8px}
+.track-input input{
+  flex:1;padding:13px 14px;border:1.5px solid var(--gray-200);
+  border-radius:8px;font-size:.95rem;outline:none;transition:border .2s;
+}
+.track-input input:focus{border-color:var(--navy)}
+.btn{padding:13px 22px;border-radius:8px;font-weight:600;font-size:.95rem;transition:transform .15s, box-shadow .2s, background .2s}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:hover{background:var(--red-dark)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy-dark)}
+.btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--navy)}
+.btn-outline:hover{background:var(--navy);color:#fff}
+.btn-block{width:100%}
+
+/* Tracker visualizer */
+.tracker-result{margin-top:22px;padding-top:22px;border-top:1px solid var(--gray-100);display:none}
+.tracker-result.active{display:block}
+.tracker-meta{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:20px;font-size:.85rem;color:var(--gray-600)}
+.tracker-meta strong{color:var(--navy);display:block;font-size:.95rem}
+.progress{
+  display:flex;justify-content:space-between;position:relative;
+  margin:30px 0 10px;
+}
+.progress::before{
+  content:"";position:absolute;top:18px;left:18px;right:18px;height:3px;
+  background:var(--gray-200);z-index:0;border-radius:3px;
+}
+.progress-fill{
+  position:absolute;top:18px;left:18px;height:3px;background:var(--red);
+  z-index:1;transition:width .6s ease;border-radius:3px;
+}
+.step{position:relative;z-index:2;text-align:center;flex:1}
+.step .dot{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--white);border:3px solid var(--gray-200);
+  margin:0 auto 8px;display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;color:var(--gray-400);
+  transition:all .3s;
+}
+.step.done .dot{background:var(--red);border-color:var(--red);color:#fff}
+.step.current .dot{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 0 0 6px rgba(10,37,64,.15)}
+.step .lbl{font-size:.72rem;color:var(--gray-600);font-weight:600;line-height:1.2}
+.step.done .lbl,.step.current .lbl{color:var(--navy)}
+
+.tracker-empty{padding:18px;background:var(--gray-50);border-radius:8px;color:var(--gray-600);font-size:.9rem;text-align:center}
+
+/* ---------- Sections ---------- */
+section.section{padding:70px 24px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-head{text-align:center;margin-bottom:45px}
+.section-head .eyebrow{color:var(--red);font-weight:700;letter-spacing:2px;font-size:.78rem;text-transform:uppercase;margin-bottom:10px}
+.section-head h2{color:var(--navy);font-size:clamp(1.6rem,3vw,2.3rem);font-weight:800}
+.section-head p{color:var(--gray-600);max-width:600px;margin:12px auto 0}
+
+/* Routes */
+.routes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
+.route-card{
+  background:var(--white);border-radius:var(--radius);padding:26px;
+  box-shadow:var(--shadow);border-top:4px solid var(--navy);
+  transition:transform .25s, box-shadow .25s;cursor:pointer;
+}
+.route-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-top-color:var(--red)}
+.route-card .icon{
+  width:50px;height:50px;border-radius:10px;background:var(--gray-50);
+  display:flex;align-items:center;justify-content:center;color:var(--red);
+  font-size:1.5rem;margin-bottom:16px;
+}
+.route-card h3{color:var(--navy);font-size:1.1rem;margin-bottom:8px}
+.route-card p{color:var(--gray-600);font-size:.9rem;margin-bottom:14px}
+.route-card .meta{display:flex;justify-content:space-between;font-size:.78rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:1px}
+
+/* Booking */
+#book{background:var(--white)}
+.booking-form{
+  max-width:880px;margin:0 auto;background:var(--gray-50);
+  border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);
+}
+.booking-locked{
+  max-width:880px;margin:0 auto;background:var(--gray-50);
+  border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);text-align:center;
+}
+.booking-locked p{color:var(--gray-600);font-size:1rem;margin:0 auto;max-width:560px}
+.booking-locked button{margin-top:22px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:.82rem;font-weight:600;color:var(--navy);letter-spacing:.3px}
+.form-group input,.form-group select,.form-group textarea{
+  padding:12px 14px;border:1.5px solid var(--gray-200);border-radius:8px;
+  font-size:.95rem;background:#fff;outline:none;transition:border .2s;
+  font-family:inherit;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--navy)}
+.form-row{display:flex;gap:18px;align-items:end;flex-wrap:wrap}
+
+/* About */
+.about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
+.about-card{background:var(--white);padding:26px;border-radius:var(--radius);box-shadow:var(--shadow);text-align:center}
+.about-card .icon{font-size:2rem;margin-bottom:10px}
+.about-card h4{color:var(--navy);margin-bottom:6px}
+.about-card p{color:var(--gray-600);font-size:.9rem}
+
+/* ---------- Modal ---------- */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(10,37,64,.65);
+  display:none;align-items:center;justify-content:center;
+  z-index:100;padding:20px;backdrop-filter:blur(4px);
+}
+.modal-backdrop.active{display:flex}
+.modal{
+  background:#fff;border-radius:14px;max-width:460px;width:100%;
+  padding:32px;box-shadow:var(--shadow-lg);position:relative;
+  max-height:90vh;overflow-y:auto;
+}
+.modal-lg{max-width:880px}
+.modal-close{
+  position:absolute;top:14px;right:14px;width:34px;height:34px;
+  border-radius:50%;background:var(--gray-100);color:var(--navy);
+  font-size:1.2rem;display:flex;align-items:center;justify-content:center;
+}
+.modal-close:hover{background:var(--gray-200)}
+.modal h2{color:var(--navy);margin-bottom:6px}
+.modal .sub{color:var(--gray-600);font-size:.9rem;margin-bottom:22px}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:2px solid var(--gray-100);margin-bottom:22px}
+.tab{flex:1;padding:12px;font-weight:600;color:var(--gray-600);transition:all .2s;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab.active{color:var(--navy);border-bottom-color:var(--red)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;background:var(--gray-50);padding:12px 14px;border-radius:8px;margin-bottom:18px}
+.toggle-row span{font-size:.85rem;color:var(--gray-600)}
+.switch{position:relative;width:44px;height:24px;background:var(--gray-200);border-radius:12px;cursor:pointer;transition:background .2s}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on{background:var(--red)}
+.switch.on::after{transform:translateX(20px)}
+
+/* Admin */
+.admin-shell{display:grid;grid-template-columns:240px 1fr;min-height:600px;gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--gray-100)}
+.admin-side{background:var(--navy);color:#fff;padding:20px}
+.admin-side h3{font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;color:#a9c0db;margin-bottom:14px}
+.admin-side button{
+  display:block;width:100%;text-align:left;color:#cfd9e6;padding:10px 12px;
+  border-radius:6px;font-size:.9rem;margin-bottom:4px;transition:all .2s;
+}
+.admin-side button:hover,.admin-side button.active{background:rgba(255,255,255,.1);color:#fff}
+.admin-main{padding:22px;background:#fff;overflow:auto}
+.admin-panel{display:none}
+.admin-panel.active{display:block}
+.admin-panel h3{color:var(--navy);margin-bottom:14px;font-size:1.15rem}
+
+.system-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:18px}
+.summary-card{background:var(--gray-50);border:1px solid var(--gray-100);padding:16px;border-radius:12px;display:flex;flex-direction:column;gap:6px}
+.summary-card span{font-size:.75rem;color:var(--gray-600);text-transform:uppercase;letter-spacing:.5px}
+.summary-card strong{font-size:1.65rem;color:var(--navy)}
+
+.shipments-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.shipments-table th,.shipments-table td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--gray-100)}
+.shipments-table th{background:var(--gray-50);color:var(--navy);font-size:.75rem;text-transform:uppercase;letter-spacing:1px}
+.shipments-table tr:hover td{background:var(--gray-50)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge-0{background:#e8eef5;color:#4a5970}
+.badge-1{background:#fff4e0;color:#a06800}
+.badge-2{background:#e0eaff;color:#1a3d8a}
+.badge-3{background:#ffe0e0;color:#a01818}
+.badge-4{background:#dff5e3;color:#157a32}
+.icon-btn{background:var(--gray-100);color:var(--navy);padding:6px 10px;border-radius:6px;font-size:.78rem;margin-right:4px}
+.icon-btn:hover{background:var(--gray-200)}
+.icon-btn.danger{color:var(--red)}
+
+.empty-state{text-align:center;color:var(--gray-400);padding:40px 20px;font-size:.9rem}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;
+  padding:14px 20px;border-radius:8px;box-shadow:var(--shadow-lg);
+  font-size:.9rem;z-index:200;transform:translateY(100px);opacity:0;
+  transition:all .3s;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#157a32}
+.toast.error{background:var(--red)}
+
+/* Footer */
+.footer{background:var(--navy);color:#cfd9e6;padding:50px 24px 24px;margin-top:0}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px}
+.footer h4{color:#fff;font-size:.95rem;margin-bottom:14px;letter-spacing:1px;text-transform:uppercase}
+.footer p,.footer li{font-size:.88rem;line-height:1.8}
+.footer ul{list-style:none}
+.footer-bottom{
+  max-width:1200px;margin:30px auto 0;padding-top:20px;
+  border-top:1px solid rgba(255,255,255,.1);
+  text-align:center;font-size:.82rem;color:#8aa0bb;
+}
+.footer-contact{background:var(--red);color:#fff;padding:16px 24px;text-align:center;font-weight:600;font-size:.92rem;letter-spacing:.3px}
+
+.user-banner{max-width:1200px;margin:0 auto 20px;padding:16px 24px;border-radius:12px;background:rgba(10,37,64,.08);color:#071b33;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 10px 30px rgba(10,37,64,.08)}
+.user-banner strong{color:#0a2540}
+.user-banner button{border-color:rgba(10,37,64,.35);color:#0a2540}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 880px){
+  .hero-inner{grid-template-columns:1fr;gap:30px}
+  .nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--navy);flex-direction:column;padding:14px;gap:4px}
+  .nav.open{display:flex}
+  .nav button{width:100%;text-align:left}
+  .menu-toggle{display:block}
+  .form-grid{grid-template-columns:1fr}
+  .admin-shell{grid-template-columns:1fr}
+  .admin-side{display:flex;overflow-x:auto;gap:6px;padding:14px}
+  .admin-side h3{display:none}
+  .admin-side button{flex-shrink:0;width:auto;margin:0}
+  .step .lbl{font-size:.62rem}
+  .progress::before,.progress-fill{top:14px}
+  .step .dot{width:28px;height:28px;font-size:.7rem}
+  .shipments-table{font-size:.78rem}
+  .shipments-table th,.shipments-table td{padding:8px 6px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo-box" id="adminUnlockArea" aria-hidden="true">
+        <img src="/logo.svg" alt="Brain TDS Logistics logo" />
+      </div>
+      <div class="brand-text">
+        <span class="name">BRAIN TDS LOGISTICS</span>
+        <span class="tag">Importation • Delivery</span>
+      </div>
+    </div>
+    <nav class="nav" id="mainNav">
+        <button onclick="scrollToId('home')">Home</button>
+      <button onclick="scrollToId('routes')">Routes</button>
+      <button id="bookNavBtn" style="display:none" onclick="openBooking()">Book Shipment</button>
+      <button onclick="scrollToId('about')">About</button>
+      <button id="signInBtn" class="btn-cta" onclick="openAuth()">Sign In / Register</button>
+      <button id="logoutBtn" class="btn btn-outline" style="display:none" onclick="customerLogout()">Logout</button>
+    </nav>
+    <button class="menu-toggle" onclick="document.getElementById('mainNav').classList.toggle('open')">☰</button>
+  </div>
+</header>
+<div id="userBanner" class="user-banner" style="display:none">
+  <div>Welcome back, <strong id="userNameDisplay"></strong> — your shipment booking page is ready.</div>
+  <button class="btn btn-outline" type="button" onclick="scrollToId('routes')">Explore Routes</button>
+</div>
+
+<!-- ============ HERO + TRACKER ============ -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div>
+      <h1>WELCOME TO BRAIN TDS LOGISTICS</h1>
+      <p class="lead">Importation & delivery from China, Dubai, USA & Nigeria to Ghana</p>
+      <p class="lead" style="margin-top:1rem">Move Cargo From <span>Anywhere</span> To Ghana — Reliably.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="openBooking()">Book a Shipment</button>
+        <button class="btn btn-outline" style="color:#fff;border-color:#fff" onclick="scrollToId('routes')">View Routes</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="num">4</div><div class="lbl">Origin Countries</div></div>
+        <div class="stat"><div class="num">2</div><div class="lbl">GH Warehouses</div></div>
+        <div class="stat"><div class="num">24/7</div><div class="lbl">Tracking</div></div>
+      </div>
+    </div>
+
+    <div class="track-card">
+      <h3>Track Your Consignment</h3>
+      <p class="sub">Enter your tracking ID to see live shipment status.</p>
+      <div class="track-input">
+        <input id="trackInput" type="text" placeholder="e.g. BTDS-2026-0001" autocomplete="off" />
+        <button class="btn btn-navy" onclick="trackShipment()">Track</button>
+      </div>
+      <div id="trackerResult" class="tracker-result"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROUTES ============ -->
+<section class="section" id="routes">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">Our Network</div>
+      <h2>International Shipping Routes</h2>
+      <p>Choose from our trusted sea and air freight corridors connecting global markets to Ghana.</p>
+    </div>
+    <div class="routes-grid" id="routesGrid"></div>
+  </div>
+</section>
+
+<!-- ============ BOOKING ============ -->
+<section class="section" id="book" style="display:none">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">Get Started</div>
+      <h2>Book a Shipment</h2>
+      <p>Fill in your cargo details. We'll contact you within 24 hours with a quote and tracking ID.</p>
+    </div>
+
+    <div id="bookingLocked" class="booking-locked">
+      <p>Booking shipments is available only after you register and sign in. Please create an account or log in to access shipment booking.</p>
+      <button class="btn btn-primary" type="button" onclick="openAuth()">Sign In / Register</button>
+    </div>
+
+    <form class="booking-form" id="bookingForm" onsubmit="submitBooking(event)" style="display:none">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input required type="text" name="name" placeholder="John Mensah" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input required type="tel" name="phone" placeholder="+233 ..." />
+        </div>
+        <div class="form-group">
+          <label>Shipping Route</label>
+          <select required name="route">
+            <option value="">Select route</option>
+            <option>China to Ghana — Sea</option>
+            <option>China to Ghana — Air</option>
+            <option>Dubai to Ghana — Cargo</option>
+            <option>USA to Ghana — Cargo</option>
+            <option>Nigeria to Ghana — Cargo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Delivery Terminal</label>
+          <select required name="terminal">
+            <option value="">Select terminal</option>
+            <option>Accra-Tema Hub</option>
+            <option>Koforidua Hub</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cargo Weight (kg)</label>
+          <input required type="number" min="0.1" step="0.1" name="weight" placeholder="50" />
+        </div>
+        <div class="form-group">
+          <label>Dimensions (L×W×H cm)</label>
+          <input type="text" name="dims" placeholder="60×40×40" />
+        </div>
+        <div class="form-group full">
+          <label>Cargo Description</label>
+          <textarea name="desc" rows="3" placeholder="Brief description of items..."></textarea>
+        </div>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+        <button type="submit" class="btn btn-primary">Submit Booking</button>
+        <button type="reset" class="btn btn-outline">Reset</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="section" id="about" style="background:#fff">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">Why Choose Us</div>
+      <h2>Built On Trust & Speed</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-card"><div class="icon">🚢</div><h4>Sea & Air Freight</h4><p>Flexible options for every budget and timeline.</p></div>
+      <div class="about-card"><div class="icon">🏬</div><h4>2 GH Warehouses</h4><p>Accra-Tema & Koforidua receiving hubs.</p></div>
+      <div class="about-card"><div class="icon">🛃</div><h4>Customs Handling</h4><p>End-to-end clearance with no surprises.</p></div>
+      <div class="about-card"><div class="icon">📍</div><h4>Live Tracking</h4><p>Real-time updates on every shipment.</p></div>
+      <div class="about-card"><div class="icon">🚚</div><h4>Last Mile Delivery</h4><p>Door-to-door delivery across Ghana with careful final-mile handling.</p></div>
+      <div class="about-card"><div class="icon">📦</div><h4>Order Fulfillment</h4><p>Efficient pick, pack, and ship services for your customers and distribution needs.</p></div>
+      <div class="about-card"><div class="icon">🧾</div><h4>Sourcing & Procurement</h4><p>Supplier sourcing and procurement support for smooth import operations.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<div class="footer-contact">
+  Warehouses: Koforidua & Accra-Tema &nbsp;|&nbsp; Phone: +233 54 098 1590 / +233 20 327 6307
+</div>
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <h4>Brain TDS Logistics</h4>
+      <p>Your trusted partner for international importation and delivery into Ghana.</p>
+    </div>
+    <div>
+      <h4>Routes</h4>
+      <ul>
+        <li>China → Ghana (Sea & Air)</li>
+        <li>Dubai → Ghana</li>
+        <li>USA → Ghana</li>
+        <li>Nigeria → Ghana</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Warehouses</h4>
+      <ul>
+        <li>Accra-Tema Hub</li>
+        <li>Koforidua Hub</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li>+233 54 098 1590</li>
+        <li>+233 20 327 6307</li>
+        <li>info@braintdslogistics.com</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">© <span id="year"></span> Brain TDS Logistics. All rights reserved.</div>
+</footer>
+
+<!-- ============ AUTH MODAL ============ -->
+<div class="modal-backdrop" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('authModal')">×</button>
+    <h2>Customer Portal</h2>
+    <p class="sub">Sign in or create an account to manage shipments.</p>
+
+    <div id="customerAuth">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(event,'loginPanel')">Login</button>
+        <button class="tab" onclick="switchTab(event,'registerPanel')">Register</button>
+      </div>
+      <div id="loginPanel" class="tab-panel active">
+        <form onsubmit="customerLogin(event)">
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Email</label>
+            <input required type="email" name="email" />
+          </div>
+          <div class="form-group" style="margin-bottom:18px">
+            <label>Password</label>
+            <input required type="password" name="password" />
+          </div>
+          <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+        </form>
+      </div>
+      <div id="registerPanel" class="tab-panel">
+        <form onsubmit="customerRegister(event)">
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Full Name</label>
+            <input required type="text" name="name" />
+          </div>
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Email</label>
+            <input required type="email" name="email" />
+          </div>
+          <div class="form-group" style="margin-bottom:18px">
+            <label>Password</label>
+            <input required type="password" name="password" minlength="6" />
+          </div>
+          <button class="btn btn-primary btn-block" type="submit">Create Account</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="adminAuth" style="display:none">
+      <form onsubmit="adminLogin(event)">
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Operator ID</label>
+          <input required type="text" name="user" placeholder="admin" />
+        </div>
+        <div class="form-group" style="margin-bottom:18px">
+          <label>Password</label>
+          <input required type="password" name="password" placeholder="admin123" />
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Secure Login</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN DASHBOARD MODAL ============ -->
+<div class="modal-backdrop" id="adminModal">
+  <div class="modal modal-lg" style="padding:0">
+    <button class="modal-close" onclick="closeModal('adminModal')" style="z-index:5">×</button>
+    <div class="admin-shell">
+      <aside class="admin-side">
+        <h3>Operator Console</h3>
+        <button class="active" onclick="switchAdminPanel(event,'systemPanel')">📊 System</button>
+        <button onclick="switchAdminPanel(event,'shipmentsPanel')">📦 Shipments</button>
+        <button onclick="switchAdminPanel(event,'createPanel')">➕ New Shipment</button>
+        <button onclick="switchAdminPanel(event,'bookingsPanel')">📋 Bookings</button>
+        <button onclick="switchAdminPanel(event,'usersPanel')">👥 Customers</button>
+        <button onclick="adminLogout()" style="margin-top:20px;color:#ffb3b3">⎋ Logout</button>
+      </aside>
+      <div class="admin-main">
+        <div id="systemPanel" class="admin-panel active">
+          <h3>System Dashboard</h3>
+          <div class="system-summary">
+            <div class="summary-card"><span>Total Shipments</span><strong id="summaryTotal">0</strong></div>
+            <div class="summary-card"><span>In Transit</span><strong id="summaryTransit">0</strong></div>
+            <div class="summary-card"><span>Pending</span><strong id="summaryPending">0</strong></div>
+            <div class="summary-card"><span>Delivered</span><strong id="summaryDelivered">0</strong></div>
+            <div class="summary-card"><span>Bookings</span><strong id="summaryBookings">0</strong></div>
+            <div class="summary-card"><span>Registered Users</span><strong id="summaryUsers">0</strong></div>
+            <div class="summary-card"><span>Online Users</span><strong id="summaryOnline">0</strong></div>
+            <div class="summary-card"><span>Latest Login</span><strong id="summaryLastLogin">-</strong></div>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary" type="button" onclick="generateTrackingId()">Generate Tracking ID</button>
+            <button class="btn btn-outline" type="button" onclick="openCreateShipment()">Create Shipment</button>
+          </div>
+        </div>
+
+        <div id="shipmentsPanel" class="admin-panel">
+          <h3>All Shipments</h3>
+          <div style="overflow-x:auto">
+            <table class="shipments-table" id="shipmentsTable">
+              <thead>
+                <tr><th>Tracking ID</th><th>Route</th><th>Terminal</th><th>Location</th><th>Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="createPanel" class="admin-panel">
+          <h3>Create / Update Shipment</h3>
+          <form id="shipmentForm" onsubmit="saveShipment(event)">
+            <input type="hidden" name="id" />
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Tracking ID</label>
+                <input required name="trackingId" placeholder="Auto-generate or custom" />
+              </div>
+              <div class="form-group" style="justify-content:end">
+                <button type="button" class="btn btn-outline" onclick="generateTrackingId()">Generate ID</button>
+              </div>
+              <div class="form-group">
+                <label>Customer Name</label>
+                <input required name="customer" />
+              </div>
+              <div class="form-group">
+                <label>Route</label>
+                <select required name="route">
+                  <option value="">Select route</option>
+                  <option>China to Ghana — Sea</option>
+                  <option>China to Ghana — Air</option>
+                  <option>Dubai to Ghana — Cargo</option>
+                  <option>USA to Ghana — Cargo</option>
+                  <option>Nigeria to Ghana — Cargo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Delivery Terminal</label>
+                <select required name="terminal">
+                  <option value="">Select</option>
+                  <option>Accra-Tema Hub</option>
+                  <option>Koforidua Hub</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Current Status</label>
+                <select required name="status">
+                  <option value="0">Order Placed</option>
+                  <option value="1">At Origin Warehouse</option>
+                  <option value="2">In Transit (Sea/Air)</option>
+                  <option value="3">Customs Clearing</option>
+                  <option value="4">Ready for Pickup / Delivered</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label>Current Physical Location</label>
+                <input required name="location" placeholder="e.g. Tema Port, Ghana" />
+              </div>
+            </div>
+            <div style="margin-top:18px;display:flex;gap:10px">
+              <button type="submit" class="btn btn-primary">Save Shipment</button>
+              <button type="reset" class="btn btn-outline" onclick="resetForm()">Clear</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="bookingsPanel" class="admin-panel">
+          <h3>Customer Bookings</h3>
+          <div style="overflow-x:auto">
+            <table class="shipments-table" id="bookingsTable">
+              <thead><tr><th>Name</th><th>Phone</th><th>Route</th><th>Terminal</th><th>Weight</th><th>Date</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="usersPanel" class="admin-panel">
+          <h3>Customer Activity</h3>
+          <div class="system-summary">
+            <div class="summary-card"><span>Registered Customers</span><strong id="summaryUsersPanel">0</strong></div>
+            <div class="summary-card"><span>Online Now</span><strong id="summaryOnlinePanel">0</strong></div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button class="btn btn-outline" type="button" id="onlineFilterBtn" onclick="toggleUserOnlineFilter()">Show Online Only</button>
+          </div>
+          <div style="overflow-x:auto;margin-top:14px">
+            <table class="shipments-table" id="usersTable">
+              <thead><tr><th>Name</th><th>Email</th><th>Signed Up</th><th>Last Login</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <h4 style="margin-top:22px">Recent Activity</h4>
+          <div style="overflow-x:auto">
+            <table class="shipments-table" id="activityTable">
+              <thead><tr><th>When</th><th>Email</th><th>Event</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DB = {
+  shipments: 'btds_shipments',
+  bookings: 'btds_bookings',
+  users: 'btds_users',
+  activity: 'btds_activity',
+  session: 'btds_session',
+};
+const STATUSES = ['Order Placed','At Origin Warehouse','In Transit (Sea/Air)','Customs Clearing','Ready for Pickup / Delivered'];
+const ADMIN_CREDS = { user:'admin', password:'admin123' };
+
+const store = {
+  get(k, fallback=[]){ try{ return JSON.parse(localStorage.getItem(k)) ?? fallback }catch{ return fallback } },
+  set(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+};
+
+const ROUTES = [
+  {icon:'🚢',title:'China → Ghana',desc:'Sea & air freight from Guangzhou, Shenzhen, Yiwu and more.',transit:'25-40 days',mode:'Sea/Air'},
+  {icon:'🛫',title:'Dubai → Ghana',desc:'Reliable cargo shipping from UAE warehouses to Tema.',transit:'10-18 days',mode:'Cargo'},
+  {icon:'🇺🇸',title:'USA → Ghana',desc:'Consolidated cargo from major US ports & airports.',transit:'18-30 days',mode:'Cargo'},
+  {icon:'🇳🇬',title:'Nigeria → Ghana',desc:'Cross-border cargo shipping with fast turnaround.',transit:'5-9 days',mode:'Cargo'},
+];
+
+function renderRoutes(){
+  const grid = document.getElementById('routesGrid');
+  grid.innerHTML = ROUTES.map(r=>`
+    <div class="route-card" onclick="openBooking()">
+      <div class="icon">${r.icon}</div>
+      <h3>${r.title}</h3>
+      <p>${r.desc}</p>
+      <div class="meta"><span>${r.mode}</span><span>${r.transit}</span></div>
+    </div>
+  `).join('');
+}
+
+function scrollToId(id){
+  document.getElementById('mainNav').classList.remove('open');
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(window.__toast);
+  window.__toast = setTimeout(()=>t.className='toast',3000);
+}
+
+function currentSession(){ return store.get(DB.session, null); }
+function isCustomerSignedIn(){ const session = currentSession(); return session && session.type === 'customer'; }
+function openBooking(){ if(isCustomerSignedIn()){ scrollToId('book'); return; } toast('Please sign in before booking a shipment','error'); openAuth(); }
+
+function renderBookingSection(){
+  const section = document.getElementById('book');
+  const locked = document.getElementById('bookingLocked');
+  const form = document.getElementById('bookingForm');
+  const navBtn = document.getElementById('bookNavBtn');
+  if(isCustomerSignedIn()){
+    if(section) section.style.display = '';
+    if(navBtn) navBtn.style.display = '';
+    if(locked) locked.style.display = 'none';
+    if(form) form.style.display = 'block';
+  } else {
+    if(section) section.style.display = 'none';
+    if(navBtn) navBtn.style.display = 'none';
+    if(locked) locked.style.display = 'none';
+    if(form) form.style.display = 'none';
+  }
+  renderUserBanner();
+  renderAuthNav();
+}
+
+function renderAuthNav(){
+  const signInBtn = document.getElementById('signInBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  if(isCustomerSignedIn()){
+    if(signInBtn) signInBtn.style.display = 'none';
+    if(logoutBtn) logoutBtn.style.display = '';
+  } else {
+    if(signInBtn) signInBtn.style.display = '';
+    if(logoutBtn) logoutBtn.style.display = 'none';
+  }
+}
+
+function renderUserBanner(){
+  const banner = document.getElementById('userBanner');
+  const nameSpan = document.getElementById('userNameDisplay');
+  if(isCustomerSignedIn()){
+    const session = currentSession();
+    if(banner) banner.style.display = 'flex';
+    if(nameSpan) nameSpan.textContent = session.name || session.email || 'Customer';
+  } else {
+    if(banner) banner.style.display = 'none';
+  }
+}
+
+function openModal(id){ document.getElementById(id).classList.add('active') }
+function closeModal(id){
+  document.getElementById(id).classList.remove('active');
+  if(id==='authModal') showCustomerPortal();
+}
+document.querySelectorAll('.modal-backdrop').forEach(b=>{
+  b.addEventListener('click',e=>{ if(e.target===b) b.classList.remove('active') });
+});
+
+function openAuth(){ showCustomerPortal(); openModal('authModal') }
+function showCustomerPortal(){
+  const modal = document.getElementById('authModal');
+  modal.querySelector('h2').textContent = 'Customer Portal';
+  modal.querySelector('.sub').textContent = 'Sign in or create an account to manage shipments.';
+  document.getElementById('customerAuth').style.display = 'block';
+  document.getElementById('adminAuth').style.display = 'none';
+  document.querySelectorAll('#customerAuth .tab').forEach((t,i)=>t.classList.toggle('active', i===0));
+  document.querySelectorAll('#customerAuth .tab-panel').forEach((p,i)=>p.classList.toggle('active', i===0));
+}
+function openAdminLogin(){
+  const modal = document.getElementById('authModal');
+  modal.querySelector('h2').textContent = 'Admin Portal';
+  modal.querySelector('.sub').textContent = 'Secure operator login. Use your admin credentials to continue.';
+  document.getElementById('customerAuth').style.display = 'none';
+  document.getElementById('adminAuth').style.display = 'block';
+}
+document.addEventListener('keydown', e=>{
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==='a'){
+    e.preventDefault();
+    openAuth();
+    openAdminLogin();
+  }
+});
+let adminUnlockClickCount = 0;
+let adminUnlockTimer = null;
+let usersOnlineOnlyFilter = false;
+const adminUnlockArea = document.getElementById('adminUnlockArea');
+if(adminUnlockArea){
+  adminUnlockArea.addEventListener('click', ()=>{
+    adminUnlockClickCount += 1;
+    clearTimeout(adminUnlockTimer);
+    adminUnlockTimer = setTimeout(()=> adminUnlockClickCount = 0, 2500);
+    if(adminUnlockClickCount >= 5){
+      adminUnlockClickCount = 0;
+      openAuth();
+      openAdminLogin();
+      toast('Admin login unlocked','success');
+    }
+  });
+}
+function switchTab(e,id){
+  document.querySelectorAll('#customerAuth .tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#customerAuth .tab-panel').forEach(p=>p.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function customerRegister(e){
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const users = store.get(DB.users);
+  if(users.find(u=>u.email===f.get('email'))){ toast('Email already registered','error'); return }
+  users.push({
+    name:f.get('name'),
+    email:f.get('email'),
+    password:f.get('password'),
+    createdAt:Date.now(),
+    lastLogin:null,
+    online:false,
+  });
+  store.set(DB.users,users);
+  addUserActivity('signup', f.get('email'));
+  toast('Account created! You can sign in.','success');
+  e.target.reset();
+}
+function customerLogin(e){
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const users = store.get(DB.users);
+  const user = users.find(u=>u.email===f.get('email') && u.password===f.get('password'));
+  if(!user){ toast('Invalid credentials','error'); return }
+  user.lastLogin = Date.now();
+  user.online = true;
+  store.set(DB.users,users);
+  store.set(DB.session,{type:'customer',email:user.email,name:user.name});
+  addUserActivity('login', user.email);
+  toast('Welcome, '+user.name,'success');
+  closeModal('authModal');
+  renderBookingSection();
+}
+function adminLogin(e){
+  e.preventDefault();
+  const f = new FormData(e.target);
+  if(f.get('user')===ADMIN_CREDS.user && f.get('password')===ADMIN_CREDS.password){
+    store.set(DB.session,{type:'admin'});
+    closeModal('authModal');
+    openAdminDashboard();
+  } else {
+    toast('Invalid operator credentials','error');
+  }
+}
+function adminLogout(){
+  localStorage.removeItem(DB.session);
+  closeModal('adminModal');
+  toast('Logged out');
+  renderBookingSection();
+}
+
+function customerLogout(){
+  const session = currentSession();
+  if(session && session.email){
+    const users = store.get(DB.users);
+    const user = users.find(u=>u.email===session.email);
+    if(user){ user.online = false; store.set(DB.users,users); addUserActivity('logout', user.email); }
+  }
+  localStorage.removeItem(DB.session);
+  renderBookingSection();
+  scrollToId('home');
+  toast('You have been logged out','success');
+}
+
+function submitBooking(e){
+  e.preventDefault();
+  if(!isCustomerSignedIn()){
+    toast('You must sign in before booking','error');
+    openAuth();
+    return;
+  }
+  const f = new FormData(e.target);
+  const booking = Object.fromEntries(f.entries());
+  booking.date = new Date().toISOString();
+  booking.customerEmail = currentSession().email;
+  const list = store.get(DB.bookings);
+  list.unshift(booking);
+  store.set(DB.bookings,list);
+  toast('Booking submitted! We will contact you shortly.','success');
+  e.target.reset();
+}
+
+function trackShipment(){
+  const id = document.getElementById('trackInput').value.trim().toUpperCase();
+  const out = document.getElementById('trackerResult');
+  if(!id){ out.classList.remove('active'); return }
+  const ship = store.get(DB.shipments).find(s=>s.trackingId.toUpperCase()===id);
+  out.classList.add('active');
+  if(!ship){
+    out.innerHTML = `<div class="tracker-empty">No shipment found for <strong>${id}</strong>. Please check the ID and try again.</div>`;
+    return;
+  }
+  const status = Number(ship.status);
+  const pct = (status/(STATUSES.length-1))*100;
+  out.innerHTML = `
+    <div class="tracker-meta">
+      <div><strong>${ship.trackingId}</strong>Tracking ID</div>
+      <div><strong>${ship.route}</strong>Route</div>
+      <div><strong>${ship.terminal}</strong>Terminal</div>
+      <div><strong>${ship.location}</strong>Current Location</div>
+    </div>
+    <div class="progress">
+      <div class="progress-fill" style="width:calc(${pct}% - ${pct===0?0:0}px)"></div>
+      ${STATUSES.map((s,i)=>`
+        <div class="step ${i<status?'done':''} ${i===status?'current':''}">
+          <div class="dot">${i<status?'✓':i+1}</div>
+          <div class="lbl">${s}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function openAdminDashboard(){
+  openModal('adminModal');
+  renderShipmentsTable();
+  renderBookingsTable();
+  renderAdminSummary();
+}
+function switchAdminPanel(e,id){
+  document.querySelectorAll('.admin-side button').forEach(b=>b.classList.remove('active'));
+  if(e?.target){ e.target.classList.add('active'); }
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='systemPanel' || id==='usersPanel') renderAdminSummary();
+  if(id==='usersPanel') renderUserAdminPanel();
+}
+function toggleUserOnlineFilter(){
+  usersOnlineOnlyFilter = !usersOnlineOnlyFilter;
+  const btn = document.getElementById('onlineFilterBtn');
+  if(btn) btn.textContent = usersOnlineOnlyFilter ? 'Show All Customers' : 'Show Online Only';
+  renderUserAdminPanel();
+}
+function openCreateShipment(){
+  document.querySelectorAll('.admin-side button').forEach(b=>b.classList.remove('active'));
+  const btn = Array.from(document.querySelectorAll('.admin-side button')).find(b=>b.textContent.includes('New Shipment'));
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('createPanel').classList.add('active');
+  resetForm();
+  generateTrackingId();
+}
+function generateTrackingId(){
+  const list = store.get(DB.shipments);
+  let id;
+  do {
+    id = 'BTDS-'+new Date().getFullYear()+'-'+Math.floor(100000 + Math.random()*900000);
+  } while(list.find(s=>s.trackingId===id));
+  document.querySelector('#shipmentForm [name=trackingId]').value = id;
+}
+function renderAdminSummary(){
+  const ships = store.get(DB.shipments);
+  const bookings = store.get(DB.bookings);
+  const users = store.get(DB.users);
+  const counts = {
+    total: ships.length,
+    pending: ships.filter(s=>Number(s.status)===0).length,
+    transit: ships.filter(s=>Number(s.status)===2).length,
+    delivered: ships.filter(s=>Number(s.status)===4).length,
+    bookings: bookings.length,
+    users: users.length,
+    online: users.filter(u=>u.online).length,
+    lastLogin: users.reduce((latest, user) => {
+      if(user.lastLogin && user.lastLogin > latest) return user.lastLogin;
+      return latest;
+    }, 0),
+  };
+  document.getElementById('summaryTotal').textContent = counts.total;
+  document.getElementById('summaryPending').textContent = counts.pending;
+  document.getElementById('summaryTransit').textContent = counts.transit;
+  document.getElementById('summaryDelivered').textContent = counts.delivered;
+  document.getElementById('summaryBookings').textContent = counts.bookings;
+  document.getElementById('summaryUsers').textContent = counts.users;
+  document.getElementById('summaryOnline').textContent = counts.online;
+  document.getElementById('summaryLastLogin').textContent = counts.lastLogin || '-';
+  const userPanelTotal = document.getElementById('summaryUsersPanel');
+  const userPanelOnline = document.getElementById('summaryOnlinePanel');
+  if(userPanelTotal) userPanelTotal.textContent = counts.users;
+  if(userPanelOnline) userPanelOnline.textContent = counts.online;
+}
+
+function addUserActivity(type,email){
+  const activity = store.get(DB.activity);
+  activity.unshift({ type, email, when: Date.now() });
+  store.set(DB.activity, activity.slice(0, 50));
+}
+
+function formatDate(value){
+  return new Date(value).toLocaleString();
+}
+
+function renderUserAdminPanel(){
+  const users = store.get(DB.users);
+  const activity = store.get(DB.activity);
+  const filteredUsers = usersOnlineOnlyFilter ? users.filter(u=>u.online) : users;
+  const usersTbody = document.querySelector('#usersTable tbody');
+  const activityTbody = document.querySelector('#activityTable tbody');
+  if(!filteredUsers.length){
+    const message = usersOnlineOnlyFilter ? 'No online customers at the moment.' : 'No registered customers yet.';
+    usersTbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">${message}</div></td></tr>`;
+  } else {
+    usersTbody.innerHTML = filteredUsers.map(u=>`
+      <tr>
+        <td>${u.name || '—'}</td>
+        <td>${u.email}</td>
+        <td>${u.createdAt?formatDate(u.createdAt):'—'}</td>
+        <td>${u.lastLogin?formatDate(u.lastLogin):'Never'}</td>
+        <td>${u.online?'<span class="badge badge-4">Online</span>':'<span class="badge badge-0">Offline</span>'}</td>
+      </tr>
+    `).join('');
+  }
+  if(!activity.length){
+    activityTbody.innerHTML = `<tr><td colspan="3"><div class="empty-state">No recent customer activity.</div></td></tr>`;
+  } else {
+    activityTbody.innerHTML = activity.slice(0, 20).map(item=>`
+      <tr>
+        <td>${formatDate(item.when)}</td>
+        <td>${item.email}</td>
+        <td>${item.type === 'signup' ? 'Signed up' : item.type === 'login' ? 'Logged in' : 'Logged out'}</td>
+      </tr>
+    `).join('');
+  }
+}
+function saveShipment(e){
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const data = Object.fromEntries(f.entries());
+  const list = store.get(DB.shipments);
+  const editId = data.id;
+  delete data.id;
+  data.updatedAt = Date.now();
+  if(editId){
+    const idx = list.findIndex(s=>s.trackingId===editId);
+    if(idx>=0) list[idx] = {...list[idx],...data};
+  } else {
+    if(list.find(s=>s.trackingId===data.trackingId)){ toast('Tracking ID already exists','error'); return }
+    data.createdAt = Date.now();
+    list.unshift(data);
+  }
+  store.set(DB.shipments,list);
+  toast('Shipment saved','success');
+  e.target.reset();
+  renderShipmentsTable();
+  document.querySelector('.admin-side button').click();
+}
+function resetForm(){ document.querySelector('#shipmentForm [name=id]').value='' }
+function editShipment(id){
+  const s = store.get(DB.shipments).find(x=>x.trackingId===id);
+  if(!s) return;
+  const form = document.getElementById('shipmentForm');
+  form.id.value = s.trackingId;
+  form.trackingId.value = s.trackingId;
+  form.customer.value = s.customer;
+  form.route.value = s.route;
+  form.terminal.value = s.terminal;
+  form.status.value = s.status;
+  form.location.value = s.location;
+  document.querySelectorAll('.admin-side button')[1].click();
+}
+function deleteShipment(id){
+  if(!confirm('Delete shipment '+id+'?')) return;
+  const list = store.get(DB.shipments).filter(s=>s.trackingId!==id);
+  store.set(DB.shipments,list);
+  renderShipmentsTable();
+  toast('Shipment deleted');
+}
+function renderShipmentsTable(){
+  const tbody = document.querySelector('#shipmentsTable tbody');
+  const list = store.get(DB.shipments);
+  if(!list.length){ tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">No shipments yet. Create one to get started.</div></td></tr>`; return }
+  tbody.innerHTML = list.map(s=>`
+    <tr>
+      <td><strong>${s.trackingId}</strong><br><span style="font-size:.75rem;color:#888">${s.customer||''}</span></td>
+      <td>${s.route}</td>
+      <td>${s.terminal}</td>
+      <td>${s.location}</td>
+      <td><span class="badge badge-${s.status}">${STATUSES[s.status]}</span></td>
+      <td>
+        <button class="icon-btn" onclick="editShipment('${s.trackingId}')">Edit</button>
+        <button class="icon-btn danger" onclick="deleteShipment('${s.trackingId}')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+function renderBookingsTable(){
+  const tbody = document.querySelector('#bookingsTable tbody');
+  const list = store.get(DB.bookings);
+  if(!list.length){ tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">No bookings yet.</div></td></tr>`; return }
+  tbody.innerHTML = list.map(b=>`
+    <tr>
+      <td>${b.name}</td><td>${b.phone}</td><td>${b.route}</td>
+      <td>${b.terminal}</td><td>${b.weight} kg</td>
+      <td>${new Date(b.date).toLocaleDateString()}</td>
+    </tr>
+  `).join('');
+}
+
+function seed(){
+  if(!store.get(DB.shipments).length){
+    store.set(DB.shipments, [
+      {trackingId:'BTDS-2026-0001',customer:'Demo Customer',route:'China to Ghana — Sea',terminal:'Accra-Tema Hub',status:2,location:'Indian Ocean — En route to Tema',createdAt:Date.now()},
+      {trackingId:'BTDS-2026-0002',customer:'Sample User',route:'Dubai to Ghana — Cargo',terminal:'Koforidua Hub',status:4,location:'Koforidua Warehouse',createdAt:Date.now()},
+    ]);
+  }
+}
+
+document.getElementById('year').textContent = new Date().getFullYear();
+seed();
+renderRoutes();
+renderBookingSection();
+renderUserBanner();
+
+document.getElementById('trackInput').addEventListener('keydown',e=>{ if(e.key==='Enter') trackShipment() });
+</script>
+</body>
+</html>
+
+
