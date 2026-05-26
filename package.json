@@ -1,6 +1,11 @@
 {
   "name": "tanstack_start_ts",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zakariapapistic/BRAIN-TDS-LOGISTICS.git"
+  },
+  "homepage": "https://Zakariapapistic.github.io/BRAIN-TDS-LOGISTICS/",
   "sideEffects": false,
   "type": "module",
   "scripts": {
