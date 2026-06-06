@@ -86,9 +86,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-    ],
-
-      },
       {
         rel: "shortcut icon",
         href: "data:,",

@@ -1121,7 +1121,9 @@ function editShipment(id){
   form.terminal.value = s.terminal;
   form.status.value = s.status;
   form.location.value = s.location;
-  document.querySelectorAll('.admin-side button')[1].click();
+  switchAdminPanel(null, 'createPanel');
+  const createButton = Array.from(document.querySelectorAll('.admin-side button')).find(b=>b.textContent.includes('New Shipment'));
+  if(createButton) createButton.classList.add('active');
 }
 function deleteShipment(id){
   if(!confirm('Delete shipment '+id+'?')) return;
