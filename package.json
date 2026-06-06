@@ -3,9 +3,9 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/Zakariapapistic/BRAIN-TDS-LOGISTICS.git"
+    "url": "https://github.com/Zakariapapistic/cargo-wise-track-main.git"
   },
-  "homepage": "https://Zakariapapistic.github.io/BRAIN-TDS-LOGISTICS/",
+  "homepage": "https://zakariapapistic.github.io/cargo-wise-track-main/",
   "sideEffects": false,
   "type": "module",
   "scripts": {

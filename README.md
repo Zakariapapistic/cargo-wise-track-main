@@ -1,4 +1,4 @@
-# BRAIN-TDS-LOGISTICS
+# cargo-wise-track-main
 
 This repository contains the Brain TDS Logistics web app.
 
@@ -6,10 +6,10 @@ This repository contains the Brain TDS Logistics web app.
 
 The project is configured to deploy from `main` using GitHub Actions.
 
-- Vite base path: `/BRAIN-TDS-LOGISTICS/`
+- Vite base path: `/cargo-wise-track-main/`
 - Build command: `npm run build`
 - GitHub Pages workflow: `.github/workflows/pages.yml`
-- Published URL: `https://Zakariapapistic.github.io/BRAIN-TDS-LOGISTICS/`
+- Published URL: `https://zakariapapistic.github.io/cargo-wise-track-main/`
 
 ## Local Development
 
@@ -24,4 +24,4 @@ When you push to `main`, GitHub Actions will build the app and publish the `dist
 
 ## Repository
 
-`https://github.com/Zakariapapistic/BRAIN-TDS-LOGISTICS.git`
+`https://github.com/Zakariapapistic/cargo-wise-track-main.git`
