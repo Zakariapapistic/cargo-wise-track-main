@@ -9,6 +9,7 @@ The project is configured to deploy from `main` using GitHub Actions.
 - Vite base path: `/cargo-wise-track-main/`
 - Build command: `npm run build`
 - GitHub Pages workflow: `.github/workflows/pages.yml`
+- Published artifact path: `dist/client`
 - Published URL: `https://zakariapapistic.github.io/cargo-wise-track-main/`
 
 ## Local Development
